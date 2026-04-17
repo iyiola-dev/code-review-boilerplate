@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Code Review Crew · BwAI Abuja 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-bracket">{</span>
+      <span class="brand-name">code review crew</span>
+      <span class="brand-bracket">}</span>
+    </div>
+    <div class="meta">
+      <span class="pill">ADK × Gemini</span>
+      <span class="pill pill-muted">BwAI Abuja · 2026</span>
+    </div>
+  </header>
+
+  <main class="shell">
+    <section class="input-card">
+      <div class="card-header">
+        <h2>paste code to review</h2>
+        <p class="card-sub">
+          The crew's three specialists will review in parallel. A synthesizer
+          merges their findings. A critic sends it back for revision until
+          it's ready to ship.
+        </p>
+      </div>
+      <textarea
+        id="code-input"
+        spellcheck="false"
+        placeholder="def login(username, password):&#10;    query = f&quot;SELECT * FROM users WHERE name='{username}' AND pw='{password}'&quot;&#10;    result = db.execute(query)&#10;    for row in result:&#10;        return row"
+      ></textarea>
+      <div class="controls">
+        <button id="review-btn">run the crew →</button>
+        <button id="sample-btn" class="secondary">load sample</button>
+      </div>
+    </section>
+
+    <section class="crew">
+      <div class="crew-grid">
+        <article class="agent-card" data-agent="security">
+          <header>
+            <span class="agent-dot"></span>
+            <h3>security</h3>
+            <span class="agent-role">paranoid</span>
+          </header>
+          <div class="agent-output" id="out-security">
+            <p class="placeholder">waiting for code…</p>
+          </div>
+        </article>
+
+        <article class="agent-card" data-agent="performance">
+          <header>
+            <span class="agent-dot"></span>
+            <h3>performance</h3>
+            <span class="agent-role">obsessive</span>
+          </header>
+          <div class="agent-output" id="out-performance">
+            <p class="placeholder">waiting for code…</p>
+          </div>
+        </article>
+
+        <article class="agent-card" data-agent="style">
+          <header>
+            <span class="agent-dot"></span>
+            <h3>style</h3>
+            <span class="agent-role">pedantic</span>
+          </header>
+          <div class="agent-output" id="out-style">
+            <p class="placeholder">waiting for code…</p>
+          </div>
+        </article>
+      </div>
+
+      <article class="agent-card final-card" data-agent="final">
+        <header>
+          <span class="agent-dot"></span>
+          <h3>final review</h3>
+          <span class="agent-role">synthesized · critiqued · revised</span>
+        </header>
+        <div class="agent-output" id="out-final">
+          <p class="placeholder">the synthesizer and critic will work here…</p>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <footer>
+    <span>built live at Build with AI Abuja · 18 April 2026</span>
+    <span class="footer-sep">·</span>
+    <span>powered by Google ADK + Gemini 2.5</span>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
