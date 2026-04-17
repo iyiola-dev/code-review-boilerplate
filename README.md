@@ -40,14 +40,18 @@ source $HOME/.local/bin/env
 # 3. Sync dependencies (reads pyproject.toml, creates .venv)
 uv sync
 
-# 4. Try the agent locally first
-export GOOGLE_CLOUD_PROJECT=$(gcloud config get-value project)
-export GOOGLE_CLOUD_LOCATION=us-central1
-export GOOGLE_GENAI_USE_VERTEXAI=True
+# 4. Configure Vertex AI credentials (persistent — ADK auto-loads agent/.env)
+cat > agent/.env <<EOF
+GOOGLE_CLOUD_PROJECT=$(gcloud config get-value project)
+GOOGLE_CLOUD_LOCATION=us-central1
+GOOGLE_GENAI_USE_VERTEXAI=True
+EOF
+
+# 5. Try the agent locally
 uv run adk web --port 8080 --allow_origins="*"
 # Then click Cloud Shell's Web Preview → port 8080
 
-# 5. Deploy to Cloud Run
+# 6. Deploy to Cloud Run
 ./deploy.sh
 ```
 
