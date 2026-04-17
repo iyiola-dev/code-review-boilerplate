@@ -43,7 +43,7 @@ export GOOGLE_GENAI_USE_VERTEXAI="True"
 
 # --- Deploy ---
 echo "🚀 Deploying to Cloud Run (takes ~2-3 minutes)..."
-adk deploy cloud_run \
+uv run adk deploy cloud_run \
   --project="${PROJECT_ID}" \
   --region="${REGION}" \
   --service_name="${SERVICE_NAME}" \

@@ -33,16 +33,20 @@ Open Cloud Shell. Make sure a GCP project is selected (`gcloud config get-value 
 git clone https://github.com/iyiola-dev/code-review-boilerplate.git
 cd code-review-boilerplate
 
-# 2. Install ADK
-pip install --user google-adk
+# 2. Install uv (fast Python package manager)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+source $HOME/.local/bin/env
 
-# 3. Try the agent locally first
+# 3. Sync dependencies (reads pyproject.toml, creates .venv)
+uv sync
+
+# 4. Try the agent locally first
 export GOOGLE_CLOUD_PROJECT=$(gcloud config get-value project)
 export GOOGLE_CLOUD_LOCATION=us-central1
 export GOOGLE_GENAI_USE_VERTEXAI=True
-adk run ./agent
+uv run adk run ./agent
 
-# 4. Deploy to Cloud Run
+# 5. Deploy to Cloud Run
 ./deploy.sh
 ```
 
@@ -67,12 +71,12 @@ code-review-boilerplate/
 ├── agent/                      # the multi-agent system
 │   ├── agent.py                # root_agent — what ADK deploys
 │   ├── prompts.py              # agent personas
-│   ├── __init__.py
-│   └── requirements.txt
+│   └── __init__.py
 ├── ui/                         # single-file frontend
 │   ├── index.html
 │   ├── style.css
 │   └── app.js
+├── pyproject.toml              # uv dependencies
 ├── deploy.sh                   # one-shot Cloud Run deploy
 └── README.md
 ```
