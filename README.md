@@ -44,7 +44,8 @@ uv sync
 export GOOGLE_CLOUD_PROJECT=$(gcloud config get-value project)
 export GOOGLE_CLOUD_LOCATION=us-central1
 export GOOGLE_GENAI_USE_VERTEXAI=True
-uv run adk run ./agent
+uv run adk web ./agent --port 8080
+# Then click Cloud Shell's Web Preview → port 8080
 
 # 5. Deploy to Cloud Run
 ./deploy.sh
