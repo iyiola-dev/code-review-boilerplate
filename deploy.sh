@@ -35,18 +35,23 @@ gcloud services enable \
   --project="${PROJECT_ID}" \
   --quiet
 
-# --- Grant Cloud Build role to default compute service account ---
-# New GCP projects (post Aug 2024) don't grant this automatically. Without it,
-# `gcloud run deploy --source` fails with "IAM permission denied for service
-# account XXXX-compute@developer.gserviceaccount.com".
-echo "🔐 Granting Cloud Build role to default compute service account..."
+# --- Grant required roles to default compute service account ---
+# New GCP projects (post Aug 2024) don't grant these automatically. We need:
+#   - roles/cloudbuild.builds.builder  — to build the container image
+#   - roles/aiplatform.user            — so the running service can call Vertex AI
+# Without the first, `gcloud run deploy --source` fails with "IAM permission
+# denied for service account XXXX-compute@developer.gserviceaccount.com".
+# Without the second, `/run_sse` returns 500 when the agent tries to call Gemini.
+echo "🔐 Granting required roles to default compute service account..."
 PROJECT_NUMBER="$(gcloud projects describe "${PROJECT_ID}" --format='value(projectNumber)')"
 COMPUTE_SA="${PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
-gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
-  --member="serviceAccount:${COMPUTE_SA}" \
-  --role="roles/cloudbuild.builds.builder" \
-  --condition=None \
-  --quiet >/dev/null
+for ROLE in "roles/cloudbuild.builds.builder" "roles/aiplatform.user"; do
+  gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
+    --member="serviceAccount:${COMPUTE_SA}" \
+    --role="${ROLE}" \
+    --condition=None \
+    --quiet >/dev/null
+done
 
 # --- Environment for the deployed agent ---
 # We use Vertex AI (no API key needed — uses the Cloud Run service's identity).
