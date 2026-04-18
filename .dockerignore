@@ -1,0 +1,12 @@
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+.git/
+.gitignore
+.env
+agent/.env
+agent/.adk/
+ui/
+deploy.sh
+README.md

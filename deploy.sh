@@ -55,30 +55,38 @@ export GOOGLE_CLOUD_LOCATION="${REGION}"
 export GOOGLE_GENAI_USE_VERTEXAI="True"
 
 # --- Deploy ---
+# We deploy via `gcloud run deploy --source .` (not `adk deploy cloud_run`) so
+# we can use our own `main.py` + `Dockerfile`. The wrapper in main.py enables
+# CORS via `allow_origins=["*"]`, which is required for the custom UI in `ui/`
+# to call this service from a different origin (localhost during dev). See:
+# https://github.com/google/adk-python/issues/1444
 echo "🚀 Deploying to Cloud Run (takes ~2-3 minutes)..."
 DEPLOY_LOG="$(mktemp)"
 trap 'rm -f "${DEPLOY_LOG}"' EXIT
 
-# adk deploy cloud_run wraps gcloud and sometimes swallows gcloud failures,
-# returning 0 even when the deploy failed. Capture output so we can grep for
-# the error ourselves.
 set +e
-uv run adk deploy cloud_run \
-  --project="${PROJECT_ID}" \
+gcloud run deploy "${SERVICE_NAME}" \
+  --source=. \
   --region="${REGION}" \
-  --service_name="${SERVICE_NAME}" \
-  --with_ui \
-  ./agent 2>&1 | tee "${DEPLOY_LOG}"
+  --project="${PROJECT_ID}" \
+  --allow-unauthenticated \
+  --set-env-vars="GOOGLE_CLOUD_PROJECT=${PROJECT_ID},GOOGLE_CLOUD_LOCATION=${REGION},GOOGLE_GENAI_USE_VERTEXAI=True" \
+  --quiet 2>&1 | tee "${DEPLOY_LOG}"
 DEPLOY_EXIT=${PIPESTATUS[0]}
 set -e
 
-if [[ ${DEPLOY_EXIT} -ne 0 ]] || grep -qE "^Deploy failed:|^ERROR: " "${DEPLOY_LOG}"; then
+if [[ ${DEPLOY_EXIT} -ne 0 ]] || grep -qE "^ERROR: " "${DEPLOY_LOG}"; then
   echo ""
   echo "❌ Deployment failed. Scroll up for the actual error."
   exit 1
 fi
 
+SERVICE_URL="$(gcloud run services describe "${SERVICE_NAME}" \
+  --region="${REGION}" \
+  --project="${PROJECT_ID}" \
+  --format='value(status.url)' 2>/dev/null)"
+
 echo ""
-echo "✅ Deployed. Your agent URL is printed above."
-echo "   Open it in a browser to see the ADK dev UI — or point the"
-echo "   custom UI (ui/index.html) at it by setting AGENT_URL in ui/app.js."
+echo "✅ Deployed: ${SERVICE_URL}"
+echo "   • ADK dev UI:  ${SERVICE_URL}/dev-ui"
+echo "   • Agent API:   ${SERVICE_URL} (paste into ui/app.js as AGENT_URL)"
