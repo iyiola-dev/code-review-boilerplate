@@ -25,6 +25,20 @@ echo "🌍 Region:   ${REGION}"
 echo "🤖 Service:  ${SERVICE_NAME}"
 echo ""
 
+# --- Pre-flight: check agent code parses ---
+# Catches stray pasted shell text / typos locally (seconds) instead of after a
+# 3-minute Cloud Build + container boot (minutes).
+echo "🐍 Checking agent/ parses..."
+for f in agent/*.py; do
+  if ! python3 -c "import ast, sys; ast.parse(open('$f').read())" 2>/tmp/adk_syntax_err; then
+    echo "❌ Syntax error in $f:"
+    cat /tmp/adk_syntax_err
+    rm -f /tmp/adk_syntax_err
+    exit 1
+  fi
+done
+rm -f /tmp/adk_syntax_err
+
 # --- Enable APIs (idempotent — safe to re-run) ---
 echo "🔧 Enabling required APIs..."
 gcloud services enable \
